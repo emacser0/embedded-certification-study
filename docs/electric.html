@@ -273,10 +273,12 @@ function expFor(q){
 
 /* ---------- Tier-1: persistence & review features ---------- */
 var QMAP={}; ALL.forEach(function(q){QMAP[q.id]=q;});
+/* 종목별 저장소 네임스페이스: 임베디드='' (기존 키 유지), 전기='elec_' (빌드 시 치환) */
+var NS='elec_';
 var LS={
-  get:function(k){try{return JSON.parse(localStorage.getItem('cbt_'+k));}catch(e){return null;}},
-  set:function(k,v){try{localStorage.setItem('cbt_'+k,JSON.stringify(v));}catch(e){}},
-  del:function(k){try{localStorage.removeItem('cbt_'+k);}catch(e){}}
+  get:function(k){try{return JSON.parse(localStorage.getItem('cbt_'+NS+k));}catch(e){return null;}},
+  set:function(k,v){try{localStorage.setItem('cbt_'+NS+k,JSON.stringify(v));}catch(e){}},
+  del:function(k){try{localStorage.removeItem('cbt_'+NS+k);}catch(e){}}
 };
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
 
