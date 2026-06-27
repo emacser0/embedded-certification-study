@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         const val BUNDLED_CONTENT = 6
 
         /** GitHub Pages base that hosts version.json + index.html (+ images). */
-        const val BASE = "https://emacser0.github.io/embedded-certification-study"
+        const val BASE = "https://emacser0.github.io/certification-study"
 
         const val ASSET_BASE = "file:///android_asset/"
         const val LOCAL_HTML = "index.html"

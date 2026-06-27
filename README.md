@@ -39,7 +39,7 @@
 ### 최초 1회 설정 — GitHub Pages 켜기
 1. 저장소를 GitHub에 푸시
 2. **Settings → Pages → Source: `Deploy from a branch` → `main` / `/docs`** 저장
-3. 잠시 후 `https://emacser0.github.io/embedded-certification-study/` 에서 `version.json`·`index.html` 제공됨
+3. 잠시 후 `https://emacser0.github.io/certification-study/` 에서 `version.json`·`index.html` 제공됨
    - 이 URL은 `MainActivity.kt`의 `BASE` 상수와 일치해야 합니다.
 
 ### 콘텐츠 업데이트를 배포하는 방법 (APK 재빌드 불필요)
