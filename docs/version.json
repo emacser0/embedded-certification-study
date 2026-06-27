@@ -1,5 +1,5 @@
 {
-  "content": 10,
-  "notes": "전기 문항 텍스트화(358문항 OCR/전사)",
-  "apk": 10
+  "content": 11,
+  "notes": "전기 수식 LaTeX 렌더(KaTeX) + 그림/텍스트 분리",
+  "apk": 11
 }
