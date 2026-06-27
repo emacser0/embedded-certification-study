@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         /** Content version bundled in this APK's assets/index.html. Bump when you ship
          *  a new APK whose bundled HTML is newer than what OTA might have delivered. */
-        const val BUNDLED_CONTENT = 5
+        const val BUNDLED_CONTENT = 6
 
         /** GitHub Pages base that hosts version.json + index.html (+ images). */
         const val BASE = "https://emacser0.github.io/embedded-certification-study"
