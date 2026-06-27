@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A simple chip / microcontroller glyph, centered in the safe zone -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,40 h28 a4,4 0 0 1 4,4 v20 a4,4 0 0 1 -4,4 h-28 a4,4 0 0 1 -4,-4 v-20 a4,4 0 0 1 4,-4 z" />
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M45,49 h18 v3 h-18 z M45,55 h18 v3 h-18 z M45,61 h12 v3 h-12 z" />
+    <!-- pins -->
+    <path android:fillColor="#FFFFFF" android:pathData="M44,34 h3 v6 h-3 z M52,34 h3 v6 h-3 z M60,34 h3 v6 h-3 z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M44,68 h3 v6 h-3 z M52,68 h3 v6 h-3 z M60,68 h3 v6 h-3 z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M30,46 h6 v3 h-6 z M30,54 h6 v3 h-6 z M30,62 h6 v3 h-6 z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M72,46 h6 v3 h-6 z M72,54 h6 v3 h-6 z M72,62 h6 v3 h-6 z" />
+</vector>
