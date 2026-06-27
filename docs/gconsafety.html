@@ -155,6 +155,7 @@
   html.dark .tag.pass{background:#14331f} html.dark .tag.fail{background:#3b1717}
   .katex{font-size:1.05em}
   .qbody .katex-display{margin:8px 0}
+  .backsel{padding:7px 11px;font-size:13px;text-decoration:none;white-space:nowrap}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
@@ -172,6 +173,7 @@ window.__rerenderMath=function(){['quiz','results','study','home'].forEach(funct
 </head>
 <body>
 <header class="top">
+  <a href="index.html" class="btn ghost backsel" title="종목 선택으로">← 종목</a>
   <h1 onclick="goHome()">🦺 건설안전기사 필기 CBT</h1>
   <div class="meta" id="topMeta"></div>
   <button class="btn ghost" id="themeBtn" onclick="toggleTheme()" title="다크 모드 전환">🌙</button>
