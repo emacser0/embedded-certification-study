@@ -155,25 +155,15 @@
   html.dark .tag.pass{background:#14331f} html.dark .tag.fail{background:#3b1717}
   .katex{font-size:1.05em}
   .qbody .katex-display{margin:8px 0}
-  .backsel{padding:7px 11px;font-size:13px;text-decoration:none;white-space:nowrap}
+  .backsel{padding:7px 11px;font-size:13px;white-space:nowrap}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js">
-/* KaTeX: 렌더 후 $..$ 수식 변환 */
-function __km(el){if(el&&window.renderMathInElement){try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}}}
-window.__rerenderMath=function(){['quiz','results','study','home'].forEach(function(id){__km(document.getElementById(id));});};
-['renderQ','renderReview','showStudy','renderResults'].forEach(function(nm){var o=window[nm];if(typeof o==="function"){window[nm]=function(){var r=o.apply(this,arguments);__km(document.body);return r;};}});
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="window.__katexReady=true;window.__rerenderMath&&window.__rerenderMath();">
-/* KaTeX: 렌더 후 $..$ 수식 변환 */
-function __km(el){if(el&&window.renderMathInElement){try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}}}
-window.__rerenderMath=function(){['quiz','results','study','home'].forEach(function(id){__km(document.getElementById(id));});};
-['renderQ','renderReview','showStudy','renderResults'].forEach(function(nm){var o=window[nm];if(typeof o==="function"){window[nm]=function(){var r=o.apply(this,arguments);__km(document.body);return r;};}});
-</script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="window.__katexReady=true;window.__rerenderMath&&window.__rerenderMath();"></script>
 </head>
 <body>
 <header class="top">
-  <a href="index.html" class="btn ghost backsel" title="종목 선택으로">← 종목</a>
+  <button id="backBtn" class="btn ghost backsel" onclick="backNav()" title="뒤로">← 종목</button>
   <h1 onclick="goHome()">⚡ 전기기사 필기 CBT</h1>
   <div class="meta" id="topMeta"></div>
   <button class="btn ghost" id="themeBtn" onclick="toggleTheme()" title="다크 모드 전환">🌙</button>
@@ -971,6 +961,10 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 function __km(el){if(el&&window.renderMathInElement){try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}}}
 window.__rerenderMath=function(){['quiz','results','study','home'].forEach(function(id){__km(document.getElementById(id));});};
 ['renderQ','renderReview','showStudy','renderResults'].forEach(function(nm){var o=window[nm];if(typeof o==="function"){window[nm]=function(){var r=o.apply(this,arguments);__km(document.body);return r;};}});
+
+/* 상황별 뒤로가기: 홈이면 종목 선택, 그 외(시험/학습/결과)면 CBT 홈 */
+function backNav(){var h=document.getElementById("home");if(h&&!h.classList.contains("hide")){location.href="index.html";}else if(window.goHome){goHome();}}
+(function(){var o=window.show;if(typeof o==="function"){window.show=function(){var r=o.apply(this,arguments);var b=document.getElementById("backBtn");if(b)b.textContent=(arguments[0]==="home")?"\u2190 \uc885\ubaa9":"\u2190 \ub4a4\ub85c";return r;};}})();
 </script>
 </body>
 </html>
