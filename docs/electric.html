@@ -708,6 +708,7 @@ function $(id){return document.getElementById(id);}
 function show(sec){['home','quiz','results','study'].forEach(function(s){$(s).classList.toggle('hide', s!==sec);}); try{window.scrollTo(0,0);}catch(e){}}
 
 function goHome(){
+  if(S && S.studyCtx){ var _q=$('quiz'),_r=$('results'); var _inQR=(_q&&!_q.classList.contains('hide'))||(_r&&!_r.classList.contains('hide')); if(_inQR){ var _c=S.studyCtx; S=null; startStudy(_c.subject,_c.idx); return; } }
   if(S && !S.submitted && Object.keys(S.answers).length>0){
     if(!confirm('진행 중인 시험이 있습니다. 나가시겠습니까?')) return;
   }
