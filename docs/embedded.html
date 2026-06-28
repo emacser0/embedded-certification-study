@@ -157,7 +157,12 @@
   html.dark .qbody img{background:#e2e8f0}
   html.dark .tag.pass{background:#14331f} html.dark .tag.fail{background:#3b1717}
   .backsel{padding:7px 11px;font-size:13px;white-space:nowrap}
+  .katex{font-size:1.05em}
+  .qbody .katex-display{margin:8px 0}
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="window.__katexReady=true;window.__rerenderMath&&window.__rerenderMath();"></script>
 </head>
 <body>
 <header class="top">
@@ -991,6 +996,11 @@ function backNav(){var h=document.getElementById("home");if(h&&!h.classList.cont
 /* 앱 하드웨어 뒤로가기: 시험/학습/결과 화면이면 CBT 홈, CBT 홈이면 종목 선택. 항상 handled(앱이 임의로 종료/뒤로가지 않도록). */
 window.__appBack=function(){var h=document.getElementById("home");if(h&&!h.classList.contains("hide")){location.href="index.html";return "handled";}if(window.goHome){goHome();}return "handled";};
 (function(){var o=window.show;if(typeof o==="function"){window.show=function(){var r=o.apply(this,arguments);var b=document.getElementById("backBtn");if(b)b.textContent=(arguments[0]==="home")?"\u2190 \uc885\ubaa9":"\u2190 \ub4a4\ub85c";return r;};}})();
+
+/* KaTeX: 렌더 후 $..$ 수식 변환 */
+function __km(el){if(el&&window.renderMathInElement){try{renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});}catch(e){}}}
+window.__rerenderMath=function(){['quiz','results','study','home'].forEach(function(id){__km(document.getElementById(id));});};
+['renderQ','renderReview','showStudy','renderResults'].forEach(function(nm){var o=window[nm];if(typeof o==="function"){window[nm]=function(){var r=o.apply(this,arguments);__km(document.body);return r;};}});
 </script>
 </body>
 </html>

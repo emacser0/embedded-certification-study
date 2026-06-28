@@ -73,6 +73,10 @@ def make_app(data_path, out_html, ns, html_title, header_html, footer_text, ai_e
 
 # 임베디드 웹: 종목 선택 버튼 + 개념 학습(concepts.json) 주입 (APK용 cbt/index.html 원본은 그대로 둠)
 emb = add_back(src)
+# 확장된 개념 노트에 LaTeX($...$)가 들어가므로 임베디드에도 KaTeX 렌더러 추가
+emb = emb.replace('</style>', '  .katex{font-size:1.05em}\n  .qbody .katex-display{margin:8px 0}\n</style>')
+emb = emb.replace('</head>', KATEX_HEAD + '</head>')
+emb = inject_before_last_script(emb, KATEX_PATCH)
 emb_cp = os.path.join(ROOT, 'docs', 'embedded', 'concepts.json')
 if os.path.exists(emb_cp):
     _ecjs = json.dumps(json.load(open(emb_cp, encoding='utf-8')), ensure_ascii=False, separators=(',', ':'))
