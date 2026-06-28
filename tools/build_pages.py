@@ -71,8 +71,14 @@ def make_app(data_path, out_html, ns, html_title, header_html, footer_text, ai_e
     open(out_html, 'w', encoding='utf-8').write(e)
     return len(data['questions']), data['sets']
 
-# 임베디드 웹: 종목 선택 버튼 주입 (APK용 cbt/index.html 원본은 그대로 둠)
-open(os.path.join(ROOT, 'docs', 'embedded.html'), 'w', encoding='utf-8').write(add_back(src))
+# 임베디드 웹: 종목 선택 버튼 + 개념 학습(concepts.json) 주입 (APK용 cbt/index.html 원본은 그대로 둠)
+emb = add_back(src)
+emb_cp = os.path.join(ROOT, 'docs', 'embedded', 'concepts.json')
+if os.path.exists(emb_cp):
+    _ecjs = json.dumps(json.load(open(emb_cp, encoding='utf-8')), ensure_ascii=False, separators=(',', ':'))
+    emb = re.sub(r'(?m)^var CONCEPTS = .*$', lambda m: 'var CONCEPTS = ' + _ecjs + ';', emb)
+    print('embedded: concepts injected')
+open(os.path.join(ROOT, 'docs', 'embedded.html'), 'w', encoding='utf-8').write(emb)
 
 # 전기기사
 nq, sets = make_app(
