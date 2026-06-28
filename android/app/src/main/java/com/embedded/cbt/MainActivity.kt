@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         const val ASSET_MARK = "/android_asset/"
 
         /** APK 에 번들된 콘텐츠 버전(= assets/version.json 의 content). 버전 올릴 때 함께 수정. */
-        const val BUNDLED_CONTENT = 24
+        const val BUNDLED_CONTENT = 34
 
         /** GitHub Pages 배포 루트(끝에 /). version.json / manifest.json / 각 파일이 이 밑에 있다. */
         const val OTA_BASE = "https://emacser0.github.io/certification-study/"
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         val remoteManifest = fetchJson(OTA_BASE + "manifest.json")
         val files = remoteManifest.optJSONArray("files") ?: return
         webRoot.mkdirs()
-        var got = 0
+        var got = 0; var failed = 0
         for (k in 0 until files.length()) {
             val o = files.getJSONObject(k)
             val p = o.getString("p"); val h = o.getString("h")
@@ -186,8 +186,14 @@ class MainActivity : AppCompatActivity() {
             // 이미 올바른 파일이 filesDir 에 있거나, 번들에 같은 해시가 있으면 건너뜀
             if (target.isFile && sha1OfFile(target) == h) continue
             if (baseHash[p] == h && !target.exists()) continue
+            // 한 파일이 실패해도 중단하지 않고 계속(부분 적용으로 페이지가 깨지지 않도록 전부 시도)
             if (downloadVerified(OTA_BASE + p, target, h)) got++
-            else { Log.w(TAG, "download failed: $p"); return }  // 실패 시 manifest 미커밋 → 다음 실행 재시도
+            else { Log.w(TAG, "download failed: $p"); failed++ }
+        }
+        if (failed > 0) {
+            // 일부 실패 → manifest 미커밋(다음 실행에 이미 받은 건 건너뛰고 실패분만 재시도)
+            Log.w(TAG, "OTA incomplete: got=$got failed=$failed — retry next launch")
+            return
         }
         // 전부 성공: filesDir 에 manifest 저장 + content 갱신
         File(webRoot.parentFile, "manifest.json").writeText(remoteManifest.toString())
@@ -240,7 +246,7 @@ class MainActivity : AppCompatActivity() {
         target.parentFile?.mkdirs()
         val tmp = File(target.parentFile, target.name + ".tmp")
         val c = (URL(urlStr).openConnection() as HttpURLConnection).apply {
-            connectTimeout = 8000; readTimeout = 30000; requestMethod = "GET"
+            connectTimeout = 15000; readTimeout = 60000; requestMethod = "GET"
         }
         return try {
             if (c.responseCode !in 200..299) return false
