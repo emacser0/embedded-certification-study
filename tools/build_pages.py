@@ -42,7 +42,7 @@ def add_back(e):
     e = inject_before_last_script(e, back_js)
     return e
 
-def make_app(data_path, out_html, ns, html_title, header_html, footer_text, ai_exp_path=None, katex=True):
+def make_app(data_path, out_html, ns, html_title, header_html, footer_text, ai_exp_path=None, katex=True, concepts_path=None):
     data = json.load(open(data_path, encoding='utf-8'))
     js = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     e = src
@@ -51,7 +51,10 @@ def make_app(data_path, out_html, ns, html_title, header_html, footer_text, ai_e
     if ai_exp_path and os.path.exists(ai_exp_path):
         aejs = json.dumps(json.load(open(ai_exp_path, encoding='utf-8')), ensure_ascii=False, separators=(',', ':'))
     e = re.sub(r'(?m)^var AI_EXP = .*$', lambda m: 'var AI_EXP = ' + aejs + ';', e)
-    e = re.sub(r'(?m)^var CONCEPTS = .*$', lambda m: 'var CONCEPTS = {};', e)
+    cjs = '{}'
+    if concepts_path and os.path.exists(concepts_path):
+        cjs = json.dumps(json.load(open(concepts_path, encoding='utf-8')), ensure_ascii=False, separators=(',', ':'))
+    e = re.sub(r'(?m)^var CONCEPTS = .*$', lambda m: 'var CONCEPTS = ' + cjs + ';', e)
     e = e.replace("var NS='';", "var NS='%s';" % ns)
     e = e.replace('<title>임베디드기사 필기 CBT</title>', '<title>%s</title>' % html_title)
     e = e.replace('📘 임베디드기사 필기 CBT', header_html)
@@ -73,7 +76,8 @@ nq, sets = make_app(
     os.path.join(ROOT, 'docs', 'electric.html'), 'elec_',
     '전기기사 필기 CBT', '⚡ 전기기사 필기 CBT',
     '전기기사 필기 CBT · 데이터: 연도별 기출(전자문제집 CBT) · 로컬 전용',
-    ai_exp_path=os.path.join(ROOT, 'docs', 'electric', 'ai_exp.json'))
+    ai_exp_path=os.path.join(ROOT, 'docs', 'electric', 'ai_exp.json'),
+    concepts_path=os.path.join(ROOT, 'docs', 'electric', 'concepts.json'))
 print('electric:', nq, 'questions,', len(sets), 'sets')
 
 # 건설안전기사
@@ -83,5 +87,6 @@ if os.path.exists(cpath):
         cpath, os.path.join(ROOT, 'docs', 'gconsafety.html'), 'cons_',
         '건설안전기사 필기 CBT', '🦺 건설안전기사 필기 CBT',
         '건설안전기사 필기 CBT · 데이터: 기출(건시스템 gunsys.com) · 로컬 전용',
-        ai_exp_path=os.path.join(ROOT, 'docs', 'gconsafety', 'ai_exp.json'))
+        ai_exp_path=os.path.join(ROOT, 'docs', 'gconsafety', 'ai_exp.json'),
+        concepts_path=os.path.join(ROOT, 'docs', 'gconsafety', 'concepts.json'))
     print('construction:', nq, 'questions,', len(sets), 'sets')
