@@ -20,7 +20,10 @@ cp -r docs/images "$A/images"
 cp -r docs/electric/img "$A/electric/img"
 cp -r docs/gconsafety/img "$A/gconsafety/img"
 cp -r docs/vendor "$A/vendor"
-# (sw.js/version.json/data.json은 불필요 — 페이지에 데이터 인라인, 오프라인이라 SW 미사용)
+# (sw.js/data.json은 불필요 — 페이지에 데이터 인라인, 오프라인이라 SW 미사용)
+
+# OTA 기준선: version.json + manifest.json(파일별 sha1)을 생성·복사
+python tools/make_manifest.py   # docs/manifest.json 생성 + assets에 version/manifest 복사
 
 # Android SDK/Gradle (이 PC 설치 위치)
 ANDROID_HOME=C:\Android\sdk  "C:\Android\gradle-8.9\bin\gradle.bat" \
@@ -29,20 +32,28 @@ ANDROID_HOME=C:\Android\sdk  "C:\Android\gradle-8.9\bin\gradle.bat" \
 ```
 - 최초 셋업/SDK 설치는 메모리의 `android-build-setup.md` 참고. 라이선스는 `C:\Android\sdk\licenses\` 해시파일로 수락됨.
 
-## 버전 올리기 (★ 5곳 동시)
-새 콘텐츠/코드 배포 때마다 숫자 N을 함께 올린다:
-| 위치 | 내용 |
-|---|---|
-| `docs/version.json` | `"content": N` (OTA 배너 트리거) |
-| `docs/sw.js` | `const VERSION = 'vN'` (서비스워커 캐시 무효화) |
-| `android/app/build.gradle` | `versionCode N` + `versionName "1.N"` (앱 업데이트 설치) |
-| `android/app/.../MainActivity.kt` | `const val BUNDLED_CONTENT = N` (OTA 우선순위) |
+## 버전 올리기
+
+콘텐츠(문항/해설/HTML) 변경과 앱 코드 변경은 별개 숫자다:
+
+- **콘텐츠만 변경** → `docs/version.json`의 `content` 만 올림(+`sw.js` VERSION). APK 재배포 불필요.
+  설치된 앱은 실행 시 OTA로 `content > BUNDLED_CONTENT` 면 바뀐 파일만 받아 적용한다.
+- **앱 코드 변경**(MainActivity 등) → `versionCode`/`versionName` 올리고 APK 재배포.
+  이때 assets 도 최신 콘텐츠로 동기화하므로 `BUNDLED_CONTENT` = 그 시점 `content` 로 맞춘다.
+
+| 위치 | 내용 | 트리거 |
+|---|---|---|
+| `docs/version.json` | `"content": N` | OTA(앱·웹 모두 갱신 감지) |
+| `docs/sw.js` | `const VERSION = 'vN'` | 웹 서비스워커 캐시 무효화 |
+| `android/app/.../MainActivity.kt` | `const val BUNDLED_CONTENT = M` | APK에 번들된 콘텐츠 버전(= 빌드시 content) |
+| `android/app/build.gradle` | `versionCode`/`versionName` | APK 업데이트 설치(코드 변경 때만) |
 
 ```bash
-sed -i "s/const VERSION = 'v15'/const VERSION = 'v16'/" docs/sw.js
-sed -i 's/const val BUNDLED_CONTENT = 15/const val BUNDLED_CONTENT = 16/' android/app/src/main/java/com/embedded/cbt/MainActivity.kt
-sed -i 's/versionCode 15/versionCode 16/; s/versionName "1.15"/versionName "1.16"/' android/app/build.gradle
-printf '{\n  "content": 16,\n  "notes": "...",\n  "apk": 16\n}\n' > docs/version.json
+# 예: 콘텐츠를 25로 올리고 OTA만 (APK 그대로)
+sed -i "s/const VERSION = 'v24'/const VERSION = 'v25'/" docs/sw.js
+printf '{\n  "content": 25,\n  "notes": "...",\n  "apk": 26\n}\n' > docs/version.json
+python tools/make_manifest.py           # manifest.json 갱신(필수 — OTA가 이걸로 파일 비교)
+git add -A && git commit && git push     # GitHub Pages 반영 → 앱이 다음 실행때 받아감
 ```
 
 ## 커밋 & 푸시
@@ -61,7 +72,7 @@ node --check docs/_c.js && rm docs/_c.js
 ```
 
 ## 동작 메커니즘 메모
-- **OTA**: 앱은 실행 시 `version.json` 확인 → `content > BUNDLED_CONTENT`면 배너 → 탭하면 `embedded.html` 받아 filesDir 저장+리로드. `loadDataWithBaseURL(asset base)`라 번들 이미지 사용.
+- **OTA(앱 재배포 없이 갱신)**: 페이지는 그대로 `file:///android_asset/…` 에서 로드하되, `MainActivity.shouldInterceptRequest` 가 `filesDir/web/<경로>` 에 받아둔 파일이 있으면 그걸 우선 서빙한다(없으면 번들 assets). `file://` origin 을 유지하므로 기존 진행/오답노트(localStorage) 보존. 실행 시 `version.json` 의 `content > max(BUNDLED_CONTENT, 받아둔버전)` 이면 `manifest.json`(파일별 sha1)을 받아 **해시가 다른 파일만** `filesDir/web/` 로 내려받고(원자적 .tmp→rename + sha1 검증), 완료 토스트. 다음 리로드/재실행부터 적용. 오프라인/실패 시 조용히 번들 사용.
 - **서비스워커**: HTML/version.json은 network-first+no-store(GitHub Pages 10분 캐시 우회). 재배포 후 새로고침 1회면 반영. `sw.js`의 VERSION 바꿔야 워커 교체.
 - **KaTeX**: CDN(jsdelivr) defer 로드. 렌더 후 `__km(document.body)`로 `$..$` 변환. 전기/건설만(임베디드는 미사용).
 - **종목 분리**: `var NS`로 localStorage 키 네임스페이스. 뒤로가기(`backNav`)는 홈=종목선택, 그외=CBT홈.
