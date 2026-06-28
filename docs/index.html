@@ -21,7 +21,27 @@
   .pick .d{color:var(--muted);font-size:13px;line-height:1.6}
   .badge{display:inline-block;margin-top:14px;font-size:12px;color:var(--accent);
     border:1px solid var(--accent);border-radius:999px;padding:3px 12px}
-  footer{color:var(--muted);text-align:center;font-size:12px;margin-top:34px}
+  /* 앱 다운로드(모바일 웹 전용) */
+  #dl{display:none;margin:26px auto 0;text-align:center}
+  #dl a{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+    background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-weight:800;font-size:15px;
+    padding:14px 26px;border-radius:14px;box-shadow:0 8px 24px rgba(22,163,74,.35)}
+  #dl a:active{transform:translateY(1px)}
+  #dl .hint{color:var(--muted);font-size:11.5px;margin-top:8px;line-height:1.5}
+  /* 버전 / 패치노트 */
+  .ver{margin-top:30px;text-align:center;font-size:12px;color:var(--muted)}
+  details.notes{max-width:520px;margin:10px auto 0;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden}
+  details.notes>summary{cursor:pointer;list-style:none;padding:11px 16px;font-size:13px;font-weight:700;color:var(--txt)}
+  details.notes>summary::-webkit-details-marker{display:none}
+  details.notes>summary::after{content:"⌄";float:right;color:var(--muted)}
+  details.notes[open]>summary::after{content:"⌃"}
+  .clog{padding:2px 16px 14px;margin:0;border-top:1px solid var(--line)}
+  .clog li{list-style:none;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12.5px;line-height:1.55}
+  .clog li:last-child{border-bottom:none}
+  .clog .h{color:var(--accent);font-weight:700;margin-right:8px}
+  .clog .dt{color:var(--muted);font-size:11px}
+  footer{color:var(--muted);text-align:center;font-size:12px;margin-top:24px}
 </style>
 </head>
 <body>
@@ -48,6 +68,18 @@
       <span class="badge">5,634문항</span>
     </a>
   </div>
+
+  <div id="dl">
+    <a id="dlLink" href="#"><span>📱</span><span>안드로이드 앱 다운로드</span></a>
+    <div class="hint">APK 직접 설치 · 설치 시 "출처를 알 수 없는 앱" 허용이 필요할 수 있습니다.<br>설치 후에는 새 문제/해설이 앱 재설치 없이 자동 반영됩니다.</div>
+  </div>
+
+  <div class="ver" id="verLine"></div>
+  <details class="notes" id="notesBox" hidden>
+    <summary>패치노트</summary>
+    <ul class="clog" id="clog"></ul>
+  </details>
+
   <footer>로컬 전용 학습 도구 · 진행기록은 종목별로 브라우저에 저장됩니다</footer>
 </div>
 <script>
@@ -56,6 +88,43 @@ window.__appBack=function(){return "exit";};
 if('serviceWorker' in navigator && location.protocol==='https:'){
   try{ navigator.serviceWorker.register('sw.js')['catch'](function(){}); }catch(e){}
 }
+
+/* 버전/패치노트 표시 + 모바일 웹이면 앱 다운로드 버튼 노출 */
+(function(){
+  var inApp = !!window.AndroidBridge;                                  // 앱(WebView) 내부면 true
+  var isMobile = window.matchMedia && window.matchMedia('(max-width:720px)').matches;
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+  function render(v){
+    v=v||{};
+    var name=v.apkName||('1.'+(v.apk||''));
+    var line=document.getElementById('verLine');
+    if(line && (v.apkName||v.apk)){
+      line.textContent='앱 v'+name+(v.apkDate?(' · 업데이트 '+v.apkDate):'');
+    }
+    var log=v.changelog||[];
+    if(log.length){
+      var ul=document.getElementById('clog'); ul.innerHTML='';
+      log.forEach(function(e){
+        var li=document.createElement('li');
+        li.innerHTML='<span class="h">v'+esc(e.v)+'</span><span class="dt">'+esc(e.date||'')+'</span><br>'+esc(e.notes||'');
+        ul.appendChild(li);
+      });
+      document.getElementById('notesBox').hidden=false;
+    }
+    // 앱 다운로드 버튼: 앱 내부가 아니고 모바일 화면일 때만
+    if(!inApp && isMobile){
+      var a=document.getElementById('dlLink');
+      a.setAttribute('href', v.apkFile||'app/cbt-latest.apk');
+      a.setAttribute('download','');
+      document.getElementById('dl').style.display='block';
+    }
+  }
+  // 네트워크 우선(최신), 실패 시 무시. 캐시 우회.
+  try{
+    fetch('version.json?t='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.json();}).then(render)['catch'](function(){render({});});
+  }catch(e){ render({}); }
+})();
 </script>
 </body>
 </html>
