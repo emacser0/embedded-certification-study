@@ -700,9 +700,10 @@ function goHome(){
   S=null; renderHome(); show('home'); $('topMeta').innerHTML='';
 }
 
+function setOrder(s){ var m=String(s.key).match(/\d+/); return m?parseInt(m[0],10):0; }
 function renderHome(){
   var g=$('setGrid'); g.innerHTML='';
-  SETS.forEach(function(s){
+  SETS.slice().sort(function(a,b){return setOrder(b)-setOrder(a);}).forEach(function(s){  // 최신 회차순
     var d=document.createElement('div'); d.className='setcard';
     d.onclick=function(){startSet(s.key,s.label);};
     d.innerHTML='<div class="t">'+s.label+'</div><div class="s">총 '+s.count+'문항 · 채점가능 '+s.gradable+'</div>';
