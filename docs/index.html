@@ -51,6 +51,8 @@
   <footer>로컬 전용 학습 도구 · 진행기록은 종목별로 브라우저에 저장됩니다</footer>
 </div>
 <script>
+/* 선택화면에서 하드웨어 뒤로가기 = 앱 종료 */
+window.__appBack=function(){return "exit";};
 if('serviceWorker' in navigator && location.protocol==='https:'){
   try{ navigator.serviceWorker.register('sw.js')['catch'](function(){}); }catch(e){}
 }

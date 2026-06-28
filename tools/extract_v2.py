@@ -81,6 +81,13 @@ def detect_ans(slots, ansmarks):
 
 def process_v2(pdf_path, out_dir, prefix, want_images=True):
     doc, qmarks, headers, ansmarks, dims = analyze(pdf_path)
+    # 번호 중복 마커 제거(읽기순서 첫 번째만) — 다른 페이지의 가짜 "1) 3)" 등이 크롭을 덮어쓰는 문제 방지
+    _seen = set(); _dq = []
+    for _q in qmarks:
+        if _q['num'] in _seen:
+            continue
+        _seen.add(_q['num']); _dq.append(_q)
+    qmarks = _dq
     if want_images:
         os.makedirs(out_dir, exist_ok=True)
     def subj_for(q):

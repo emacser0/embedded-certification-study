@@ -953,9 +953,9 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 }
 
 /* 상황별 뒤로가기: 문제풀기/학습/결과 → CBT 홈, CBT 홈 → 종목 선택 */
-function backNav(){var h=document.getElementById("home");if(h&&!h.classList.contains("hide")){if(history.length>1){history.back();}else{location.href="index.html";}}else if(window.goHome){goHome();}}
-/* 앱 하드웨어 뒤로가기: 안 홈이면 CBT 홈(handled), 홈이면 exit(네이티브가 종목선택으로) */
-window.__appBack=function(){var h=document.getElementById("home");if(h&&h.classList.contains("hide")){if(window.goHome){goHome();}return "handled";}return "exit";};
+function backNav(){var h=document.getElementById("home");if(h&&!h.classList.contains("hide")){if(window.goHome){goHome();}}else{location.href="index.html";}}
+/* 앱 하드웨어 뒤로가기: 문제풀기/학습/결과→CBT홈, CBT홈→종목선택. 모두 handled. */
+window.__appBack=function(){var h=document.getElementById("home");if(h&&h.classList.contains("hide")){if(window.goHome){goHome();}return "handled";}location.href="index.html";return "handled";};
 (function(){var o=window.show;if(typeof o==="function"){window.show=function(){var r=o.apply(this,arguments);var b=document.getElementById("backBtn");if(b)b.textContent=(arguments[0]==="home")?"← 종목":"← 뒤로";return r;};}})();
 </script>
 </body>

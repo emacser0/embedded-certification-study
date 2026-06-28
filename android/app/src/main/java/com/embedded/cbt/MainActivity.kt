@@ -73,11 +73,10 @@ class MainActivity : AppCompatActivity() {
         // 하드웨어 뒤로가기: 페이지에 위임(문제풀기→CBT 홈), 홈/선택화면이면 네이티브 히스토리/종료
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                // 페이지가 처리(CBT홈/문제풀기 단계)하면 handled, 선택화면이면 exit→앱 종료
                 webView.evaluateJavascript("(window.__appBack&&window.__appBack())||'exit'") { res ->
                     val r = res?.trim('"') ?: "exit"
-                    if (r != "handled") {
-                        if (webView.canGoBack()) webView.goBack() else finish()
-                    }
+                    if (r != "handled") finish()
                 }
             }
         })
