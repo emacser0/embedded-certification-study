@@ -4,7 +4,7 @@
  *       오프라인일 때만 캐시 폴백. 이미지 등은 stale-while-revalidate.
  * 이 파일(VERSION)을 바꿔 배포하면 기존 탭은 새 워커 활성화 시 자동 새로고침.
  */
-const VERSION = 'v17';
+const VERSION = 'v18';
 const CACHE = 'cbt-' + VERSION;
 const SHELL = ['index.html', 'embedded.html', 'electric.html', 'gconsafety.html', 'version.json'];
 

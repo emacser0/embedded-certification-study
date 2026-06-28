@@ -23,3 +23,6 @@ cbt/_check.js
 node_modules/
 package.json
 package-lock.json
+
+# APK assets = docs 웹 번들 복사본(빌드 시 생성). docs/가 원본.
+android/app/src/main/assets/
