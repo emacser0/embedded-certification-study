@@ -15,15 +15,17 @@ python tools/build_pages.py
 ```bash
 A=android/app/src/main/assets
 rm -rf "$A" && mkdir -p "$A/electric" "$A/gconsafety"
-cp docs/index.html docs/embedded.html docs/electric.html docs/gconsafety.html "$A/"
+cp docs/index.html docs/embedded.html docs/electric.html docs/gconsafety.html docs/changelog.html "$A/"
 cp -r docs/images "$A/images"
 cp -r docs/electric/img "$A/electric/img"
 cp -r docs/gconsafety/img "$A/gconsafety/img"
 cp -r docs/vendor "$A/vendor"
 # (sw.js/data.json은 불필요 — 페이지에 데이터 인라인, 오프라인이라 SW 미사용)
 
-# OTA 기준선: version.json + manifest.json(파일별 sha1)을 생성·복사
-python tools/make_manifest.py   # docs/manifest.json 생성 + assets에 version/manifest 복사
+# OTA 기준선: manifest.json(파일별 sha1) 생성 후 version/manifest를 assets로 복사
+python tools/make_manifest.py            # docs/manifest.json 생성(assets는 건드리지 않음)
+cp docs/version.json docs/manifest.json "$A/"
+# ★ BUNDLED_CONTENT = 지금 docs/version.json 의 content 로 맞춰야 함(아래 버전 올리기 표 참고)
 
 # Android SDK/Gradle (이 PC 설치 위치)
 ANDROID_HOME=C:\Android\sdk  "C:\Android\gradle-8.9\bin\gradle.bat" \
