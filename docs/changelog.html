@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>패치노트 — 자격증 CBT</title>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--line:#334155;--txt:#e2e8f0;--muted:#94a3b8;--accent:#3b82f6}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:linear-gradient(160deg,#0f172a,#1e293b);color:var(--txt);
+    font-family:"Malgun Gothic","맑은 고딕",system-ui,-apple-system,sans-serif}
+  .wrap{max-width:640px;margin:0 auto;padding:36px 18px 60px}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .back{text-decoration:none;color:var(--txt);background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:7px 12px;font-size:13px;white-space:nowrap}
+  .back:hover{border-color:var(--accent)}
+  h1{font-size:22px;margin:0}
+  .meta{color:var(--muted);font-size:12.5px;margin:2px 0 22px;padding-left:2px}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+  .item .vh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .item .v{font-size:16px;font-weight:800;color:var(--accent)}
+  .item .dt{font-size:12px;color:var(--muted)}
+  .item .body{font-size:13.5px;line-height:1.65;color:var(--txt)}
+  .empty{color:var(--muted);text-align:center;padding:40px 0;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html">← 홈</a>
+    <h1>패치노트</h1>
+  </div>
+  <div class="meta" id="meta"></div>
+  <div id="list"><div class="empty">불러오는 중…</div></div>
+</div>
+<script>
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
+function render(v){
+  v=v||{};
+  var meta=document.getElementById('meta');
+  var name=v.apkName||('1.'+(v.apk||''));
+  var when=v.updated||v.apkDate||'';
+  if(v.apkName||v.apk) meta.textContent='현재 앱 v'+name+(when?(' · 마지막 업데이트 '+when):'');
+  var log=v.changelog||[];
+  var list=document.getElementById('list');
+  if(!log.length){ list.innerHTML='<div class="empty">표시할 패치노트가 없습니다.</div>'; return; }
+  list.innerHTML='';
+  log.forEach(function(e){
+    var d=document.createElement('div'); d.className='item';
+    d.innerHTML='<div class="vh"><span class="v">v'+esc(e.v)+'</span><span class="dt">'+esc(e.date||'')+'</span></div>'+
+                '<div class="body">'+esc(e.notes||'')+'</div>';
+    list.appendChild(d);
+  });
+}
+try{
+  fetch('version.json?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.json();}).then(render)['catch'](function(){
+      document.getElementById('list').innerHTML='<div class="empty">패치노트를 불러올 수 없습니다.</div>';
+    });
+}catch(e){ document.getElementById('list').innerHTML='<div class="empty">패치노트를 불러올 수 없습니다.</div>'; }
+</script>
+</body>
+</html>

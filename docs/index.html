@@ -28,19 +28,11 @@
     padding:14px 26px;border-radius:14px;box-shadow:0 8px 24px rgba(22,163,74,.35)}
   #dl a:active{transform:translateY(1px)}
   #dl .hint{color:var(--muted);font-size:11.5px;margin-top:8px;line-height:1.5}
-  /* 버전 / 패치노트 */
+  /* 버전 / 업데이트 */
   .ver{margin-top:30px;text-align:center;font-size:12px;color:var(--muted)}
-  details.notes{max-width:520px;margin:10px auto 0;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;overflow:hidden}
-  details.notes>summary{cursor:pointer;list-style:none;padding:11px 16px;font-size:13px;font-weight:700;color:var(--txt)}
-  details.notes>summary::-webkit-details-marker{display:none}
-  details.notes>summary::after{content:"⌄";float:right;color:var(--muted)}
-  details.notes[open]>summary::after{content:"⌃"}
-  .clog{padding:2px 16px 14px;margin:0;border-top:1px solid var(--line)}
-  .clog li{list-style:none;padding:10px 0;border-bottom:1px dashed var(--line);font-size:12.5px;line-height:1.55}
-  .clog li:last-child{border-bottom:none}
-  .clog .h{color:var(--accent);font-weight:700;margin-right:8px}
-  .clog .dt{color:var(--muted);font-size:11px}
+  .noteslink{display:none;margin:8px auto 0;text-align:center;font-size:12.5px;
+    color:var(--accent);text-decoration:none}
+  .noteslink:hover{text-decoration:underline}
   footer{color:var(--muted);text-align:center;font-size:12px;margin-top:24px}
 </style>
 </head>
@@ -75,10 +67,7 @@
   </div>
 
   <div class="ver" id="verLine"></div>
-  <details class="notes" id="notesBox" hidden>
-    <summary>패치노트</summary>
-    <ul class="clog" id="clog"></ul>
-  </details>
+  <a class="noteslink" id="notesLink" href="changelog.html">패치노트 →</a>
 
   <footer>로컬 전용 학습 도구 · 진행기록은 종목별로 브라우저에 저장됩니다</footer>
 </div>
@@ -93,23 +82,17 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 (function(){
   var inApp = !!window.AndroidBridge;                                  // 앱(WebView) 내부면 true
   var isMobile = window.matchMedia && window.matchMedia('(max-width:720px)').matches;
-  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
   function render(v){
     v=v||{};
     var name=v.apkName||('1.'+(v.apk||''));
     var line=document.getElementById('verLine');
     if(line && (v.apkName||v.apk)){
-      line.textContent='앱 v'+name+(v.apkDate?(' · 업데이트 '+v.apkDate):'');
+      var when=v.updated||v.apkDate||'';
+      line.textContent='앱 v'+name+(when?(' · 마지막 업데이트 '+when):'');
     }
-    var log=v.changelog||[];
-    if(log.length){
-      var ul=document.getElementById('clog'); ul.innerHTML='';
-      log.forEach(function(e){
-        var li=document.createElement('li');
-        li.innerHTML='<span class="h">v'+esc(e.v)+'</span><span class="dt">'+esc(e.date||'')+'</span><br>'+esc(e.notes||'');
-        ul.appendChild(li);
-      });
-      document.getElementById('notesBox').hidden=false;
+    // 패치노트는 별도 페이지(changelog.html). 앱 번들엔 없을 수 있어 웹에서만 링크 노출.
+    if(!inApp && v.changelog && v.changelog.length){
+      document.getElementById('notesLink').style.display='block';
     }
     // 앱 다운로드 버튼: 앱 내부가 아니고 모바일 화면일 때만
     if(!inApp && isMobile){
